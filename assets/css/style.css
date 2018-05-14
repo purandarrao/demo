@@ -1,0 +1,38 @@
+body {
+    font-family: 'Pangolin', cursive;
+    background-image: url("../images/memphis-colorful/memphis-colorful.png");
+}
+
+/* header */
+#header, #footer{
+    background: lightblue;
+    text-align: center;
+}
+
+
+/* main game */
+.card {
+    border: lightblue .2em solid;
+}
+
+
+
+/* message box */
+#dialogue {
+    width: 100%;
+    height: 10em;
+    background: #ffffff;
+    border: lightblue .25em solid;
+    overflow: auto;
+}
+
+#my_message {
+    width: 100%;
+    margin: .5em 0;
+    border: lightblue .25em solid;
+}
+
+/* footer */
+#footer {
+    margin: 1em 0;
+}
