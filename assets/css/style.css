@@ -9,12 +9,20 @@ body {
     text-align: center;
 }
 
+/* start game */
 
 /* main game */
 .card {
     border: lightblue .2em solid;
 }
 
+.card h5 {
+    text-align: center;
+}
+
+.card button {
+    width: 100%;
+}
 
 
 /* message box */
@@ -26,7 +34,7 @@ body {
     overflow: auto;
 }
 
-#my_message {
+#my_message, #player_name {
     width: 100%;
     margin: .5em 0;
     border: lightblue .25em solid;

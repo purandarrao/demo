@@ -6,6 +6,9 @@
     <link href="https://fonts.googleapis.com/css?family=Pangolin" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" typpe="text/css" href="assets/css/style.css">
+    <script src="https://www.gstatic.com/firebasejs/5.0.2/firebase.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="assets/javascript/game.js"></script>
 </head>
 
 <body>
@@ -17,21 +20,26 @@
             </div>
         </div>
 
+        <!-- start game -->
+        <div class="row justify-content-center">
+            <div class="col-8 col-md-4 align-self-center">
+                <input type="text" id="player_name" placeholder="name">
+            </div>
+            <div class="col-2 col-md-2 align-self-center">
+                <button type="submit" class="btn btn-primary" id="startBnt">Start</button>
+            </div>
+        </div>
+
         <!-- main game -->
         <div class="row justify-content-center" id="game_div">
             <div class="col-10 col-md-3 m-2" id="player1">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
+                        <h5 class="card-title" id="player1_name">Wait for player 1</h5>
                     </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Cras justo odio</li>
-                        <li class="list-group-item">Dapibus ac facilisis in</li>
-                        <li class="list-group-item">Vestibulum at eros</li>
-                    </ul>
-                    <div class="card-body">
-                        <a href="#" class="card-link">Card link</a>
-                        <a href="#" class="card-link">Another link</a>
+                    <div id="player1_choice"></div>
+                    <div class="card-body" id="player1_result">
+                        
                     </div>
                 </div>
             </div>
@@ -39,8 +47,7 @@
             <div class="col-10 col-md-3 m-2" id="result">
                 <div class="card" >
                     <div class="card-body">
-                        <h5 class="card-title">Erin won!</h5>
-
+                        <!-- <h5 class="card-title">Erin won!</h5> -->
                     </div>
                 </div>
                 
@@ -49,16 +56,15 @@
             <div class="col-10 col-md-3 m-2" id="player2">
                 <div class="card" >
                     <div class="card-body">
-                        <h5 class="card-title">Card title</h5>
+                        <h5 class="card-title" id="player2_name">Wait for player 2</h5>
                     </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Cras justo odio</li>
+                    <ul class="list-group list-group-flush" id="player2_choice">
+                        <!-- <li class="list-group-item">Cras justo odio</li>
                         <li class="list-group-item">Dapibus ac facilisis in</li>
-                        <li class="list-group-item">Vestibulum at eros</li>
+                        <li class="list-group-item">Vestibulum at eros</li> -->
                     </ul>
-                    <div class="card-body">
-                        <a href="#" class="card-link">Card link</a>
-                        <a href="#" class="card-link">Another link</a>
+                    <div class="card-body" id="player2_result">
+                        
                     </div>
                 </div>
             </div>
