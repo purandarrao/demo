@@ -24,6 +24,11 @@ body {
     width: 100%;
 }
 
+.my_choice{
+    background-color: lightblue;
+    border: #ffffff solid 1px;
+}
+
 
 /* message box */
 #dialogue {

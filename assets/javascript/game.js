@@ -18,11 +18,13 @@ var in_game = false;
 var my_name = "";
 var my_win = 0;
 var my_lose = 0;
+var my_tie = 0;
 var my_choice = "";
 var enemy = "";
 var enemy_choice = "";
 var my_enemy_key = null;
-var my_key = null;
+var my_key = player_ref.push().getKey();;
+var wait_time;
 
 function printChoice(id){
     $(id).empty()
@@ -32,31 +34,43 @@ function printChoice(id){
 
 }
 
-function printResult(id,wins,loses){
+function printResult(id){
     $(id).empty();
-    $(id).text("Wins: " + wins + "  Loses: "+ loses);
+    $(id).text("Wins: " + my_win + "    Loses: "+ my_lose + "   Tie: " + my_tie );
 }
 
 function checkWhoWin(){
+    $("#player1_choice .my_choice").css("background-color", "lightblue");
+    $("#game_result").empty();
+    $("#game_result").append("<h6>Your choice: "+my_choice+"</h>")
+    $("#game_result").append("<h6>"+enemy +"'s choice: "+enemy_choice+"</h>")
+    
+    // compare choices
     var r1 = my_choice === "Rock" && enemy_choice == "Paper";
     var r2 = my_choice === "Paper" && enemy_choice == "Scissors";
     var r3 = my_choice === "Scissors" && enemy_choice == "Rock";
     var r4 = my_choice === enemy_choice;
 
-    $("#game_result").empty();
     if(r1 | r2 | r3){
         $("#game_result").append("<h5>"+enemy+" won!</h5>")
+        my_lose += 1;
     }else if(r4){
         $("#game_result").append("<h5>No one won!</h5>");
+        my_tie += 1;
     }else{
         $("#game_result").append("<h5>"+my_name+" won!</h5>")
+        my_win += 1;
     }
+
+    printResult("#player1_result");
+    // clean up
     enemy_choice = "";
     my_choice = "";
     database.ref("players/"+my_key).update({choice:""});
 }
 
 $("document").ready(function(){
+    wait_time = moment().format("X");
 
     // handle startBnt click
     $("#startBnt").on("click",function(){
@@ -66,7 +80,6 @@ $("document").ready(function(){
             player_ref.orderByChild("name").equalTo(name).once("value",function(snapshot){
                 if(! snapshot.val()){ // if user name is not existing                   
                     my_name = name;
-                    var wait_time = moment().format("X");
 
                     // find player who waits for the longest
                     player_ref.orderByChild("waitTime").limitToLast(1).once("value",function(snapshot){
@@ -80,22 +93,33 @@ $("document").ready(function(){
                                 wait_time = Number.MIN_VALUE;
 
                                 // set myself as the enemy of the returned player and waitTime to min integer 
-                                database.ref("players/"+my_enemy_key).update({enemy: my_name,
-                                                                              waitTime: wait_time});
-                                // database.ref("players/"+my_enemy_key).update({waitTime: wait_time});                               
+                                database.ref("players/"+my_enemy_key).update({enemy: my_name, waitTime: wait_time});                                 
+
+                                // handle enemy offline event
+                                database.ref("players/"+my_enemy_key).on('value', function(snapshot) {
+                                    console.log("snapshot.val()="+snapshot.val())
+                                    
+                                    if (snapshot.val() === null && enemy !== "") {
+                                        // console.log(snapshot.val())
+                                        database.ref("players/"+my_enemy_key).remove();
+                                        $("#player2_name").text(enemy + " has left the game!");
+                                        $("#player2_choice").empty();
+                                        $("#player2_result").empty();
+                                        database.ref("players/"+my_key).update({enemy:"",waitTime:moment().format("X")});
+                                    }
+                                });
                             }
                         } 
                 
                         // save my info into database
                         var player_info = { 
-                                            name: my_name,
-                                            wins: my_win,
-                                            loses: my_lose,
-                                            enemy: enemy,
-                                            waitTime: wait_time,
-                                            choice: ""
-                                        }
-                        my_key = player_ref.push(player_info).getKey();
+                            name: my_name,
+                            enemy: enemy,
+                            waitTime: wait_time,
+                            choice: "",
+                            online: true,
+                        }
+                        database.ref("players/"+my_key).update(player_info);
 
                         // clear the start input
                         $("#player_name").val("");
@@ -105,50 +129,68 @@ $("document").ready(function(){
                             var data = snapshot.val();
                             if(data !== ""){
                                 player_ref.orderByChild("name").equalTo(data).once("value",function(snap){
-                                    var key = Object.keys(snap.val())[0];
-                                    var enemy_data = snap.val()[key];
+                                    my_enemy_key = Object.keys(snap.val())[0];
+                                    var enemy_data = snap.val()[my_enemy_key];
                                     
                                     if(enemy_data !== null){
                                         // render player2's choice and score
                                         enemy = enemy_data.name;
                                         $("#player2_name").text(enemy);
                                         printChoice("#player2_choice");
-                                        printResult("#player2_result",enemy_data.wins,enemy_data.loses);
+                                        printResult("#player2_result");
                                         
-                                        database.ref("players/"+key+"/choice").on("value",function(snapshot){
+                                        database.ref("players/"+my_enemy_key+"/choice").on("value",function(snapshot){
                                             enemy_choice = snapshot.val()
                                             if(my_choice !== ""){
-                                                console.log("enemy guess");
-                                                console.log("enemy_choice="+enemy_choice);
-                                                console.log("my_choice="+my_choice);
                                                 checkWhoWin();
                                             }
                                         })
+
+                                        // handle enemy offline event
+                                        database.ref("players/"+my_enemy_key).on('value', function(snapshot) {
+                                            console.log("snapshot.val()="+snapshot.val())
+                                            
+                                            if (snapshot.val() === null && enemy !== "") {
+                                                $("#player2_name").text(enemy + " has left the game!");
+                                                $("#player2_choice").empty();
+                                                $("#player2_result").empty();
+                                                database.ref("players/"+my_key).update({enemy:"",waitTime:moment().format("X")});
+                                            }
+                                        });
                                     }
                                 })
                             }
                             
                         })
                     
-                        // check database and // render player1's choice and score
+                        
+                        // check database and render player1's choice and score
                         database.ref("players/"+my_key).on("value",function(snapshot){
                             var data = snapshot.val()
                             if(data !== null){
-                                $("#player1_name").text(data.name);
-                                printChoice("#player1_choice");
-                                printResult("#player1_result",data.wins,data.loses);
+                                if(!in_game){
+                                    $("#player1_name").text(data.name);
+                                    printChoice("#player1_choice");
+                                    printResult("#player1_result");
+                                }
+                                in_game = true;
                             }
                         })
 
                         database.ref("players/"+my_key+"/choice").on("value",function(snapshot){
                             my_choice = snapshot.val();
                             if(enemy_choice !== ""){
-                                console.log("my_guess")
-                                console.log("enemy_choice="+enemy_choice);
-                                console.log("my_choice="+my_choice);
                                 checkWhoWin();
                             }
                         })
+
+                        // handle enemy offline event
+                        database.ref("players/"+my_key+"/online").on('value', function(snapshot) {
+                            if (snapshot.val()) {
+                                database.ref("players/"+my_key).onDisconnect().remove();
+                            }
+                        });
+
                     })              
                 }else{  // if player name is already existed
                     alert("This user name has been used by other player!")
@@ -160,12 +202,11 @@ $("document").ready(function(){
     $("#player1_choice").on("click",".my_choice",function(){
         if(my_choice === "" && enemy !== ""){
             my_choice = $(this).text();
-            $(this).attr("style","color:#4CAF50");
+            $(this).css('background-color','red')
+            $("#game_result").empty();
             database.ref("players/"+my_key).update({choice:my_choice});
         }
     })
-
-
 
 })
 
