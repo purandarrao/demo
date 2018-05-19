@@ -31,21 +31,24 @@ function printChoice(id){
     $(id).append("<button class='list-group-item my_choice'>Rock</button>");
     $(id).append("<button class='list-group-item my_choice'>Paper</button>");
     $(id).append("<button class='list-group-item my_choice'>Scissors</button>");
-
 }
 
-function printResult(id,win,lose,tie){
+function printScore(id,win,lose,tie){
     $(id).empty();
     $(id).text("Wins: " + win + "    Loses: "+ lose + "   Tie: " + tie );
 }
 
-// check who wins the game when both players made a choice
-function checkWhoWin(){
+function printPlayersChoices(){
     $("#player1_choice .my_choice").css("background-color", "lightblue");
     $("#game_result").empty();
     $("#game_result").append("<h6>Your choice: "+my_choice+"</h>")
     $("#game_result").append("<h6>"+enemy +"'s choice: "+enemy_choice+"</h>")
-    
+}
+
+// check who wins the game when both players made a choice
+function checkWhoWin(){
+    printPlayersChoices();
+
     // compare choices
     var r1 = my_choice === "Rock" && enemy_choice == "Paper";
     var r2 = my_choice === "Paper" && enemy_choice == "Scissors";
@@ -63,8 +66,8 @@ function checkWhoWin(){
         my_win += 1;
     }
 
-    printResult("#player1_result",my_win,my_lose,my_tie);
-    printResult("#player2_result",my_lose,my_win,my_tie);
+    printScore("#player1_result",my_win,my_lose,my_tie);
+    printScore("#player2_result",my_lose,my_win,my_tie);
     // clean up
     enemy_choice = "";
     my_choice = "";
@@ -77,22 +80,43 @@ function checkNewMessage(){
         var message = snapshot.val()
         if(message !== null && message !== ""){
             $("#dialogue").append("<p>"+enemy+": "+message+"</p>");           
-            $('#dialogue').css("border",'Tomato .3em solid');
-           
+            $('#dialogue').css("border",'Tomato .3em solid');        
+        }
+    })
+}
+
+// check who is available and print at most 4 out
+function checkWhoIsavailable(){
+    player_ref.orderByChild("waitTime").limitToLast(4).once("value",function(snapshot){
+        var data = snapshot.val();
+        if(data != null){
+            var keys = Object.keys(data);
+            if(keys.length > 1){
+                $("#player2_choice").append("<p>Available players:</p>");
+            }
+
+            // print available players except myself
+            for(var i=0; i<keys.length; i++){
+                var key = keys[i]; 
+                if(data[key].name != my_name && data[key].enemy === ""){ 
+                    $("#player2_choice").append("<button class='list-group-item nextPlayer'>"+data[key].name+"</button>");
+                }
+            }
         }
     })
 }
 
 // remove player2 if offline and tell player1 who is available 
 function enemyOfflineHandle(){
-    database.ref("players/"+my_enemy_key).on('value', function(snapshot) {
-        
+    database.ref("players/"+my_enemy_key).on('value', function(snapshot) {     
         if (snapshot.val() === null && enemy !== "") {
             database.ref("players/"+my_enemy_key).remove();
             $("#player2_name").text(enemy + " has left the game!");
             $("#player2_choice").empty();
             $("#player2_result").empty();
-            database.ref("players/"+my_key).update({enemy:"",waitTime:moment().format("X")});
+            database.ref("players/"+my_key).update({enemy:"",
+                                                    waitTime:moment().format("X"),
+                                                    message:""});
 
             // reset variables
             enemy = "";
@@ -101,24 +125,7 @@ function enemyOfflineHandle(){
             in_game = false;
 
             // check who is available 
-            player_ref.orderByChild("waitTime").limitToLast(4).once("value",function(snapshot){
-                var data = snapshot.val();
-                if(data != null){
-                    var keys = Object.keys(data);
-                    if(keys.length > 1){
-                        $("#player2_choice").append("<p>Available players:</p>");
-                    }
-
-                    for(var i=0; i<keys.length; i++){
-                        var key = keys[i]; 
-                  
-                        if(data[key].name != my_name && data[key].enemy === ""){ 
-                            $("#player2_choice").append("<button class='list-group-item nextPlayer'>"+data[key].name+"</button>");
-                        }
-                    }
-                }
-            })
-
+            checkWhoIsavailable();
         }
     });
 }
@@ -139,14 +146,15 @@ function checkIfHaveEnemy(){
                     enemy = enemy_data.name;
                     $("#player2_name").text(enemy);
                     printChoice("#player2_choice");
-                    printResult("#player2_result",my_lose,my_win,my_tie);
-                    
+                    printScore("#player2_result",my_lose,my_win,my_tie);
+                    $("#dialogue").empty();
+
                     // check if there is a new message from player2
                     checkNewMessage();
 
                     database.ref("players/"+my_enemy_key+"/choice").on("value",function(snapshot){
                         enemy_choice = snapshot.val();
-                        if(my_choice !== ""){
+                        if(enemy_choice !== "" && my_choice !== ""){
                             checkWhoWin();
                         }
                     })
@@ -182,7 +190,7 @@ function initPlayer1Game(){
             if(!in_game){
                 $("#player1_name").text(data.name);
                 printChoice("#player1_choice");
-                printResult("#player1_result",my_win,my_lose,my_tie);
+                printScore("#player1_result",my_win,my_lose,my_tie);
             }
             in_game = true;
         }
@@ -239,7 +247,8 @@ $("document").ready(function(){
 
                         // check if player1 makes a choice
                         database.ref("players/"+my_key+"/choice").on("value",function(snapshot){
-                            if(enemy_choice !== ""){ // if player2 has made a choice
+                            my_choice = snapshot.val();
+                            if(my_choice !== "" && enemy_choice !== ""){ // if player2 has made a choice
                                 checkWhoWin();
                             };
                         })
