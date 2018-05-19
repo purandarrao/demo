@@ -55,7 +55,7 @@ function checkWhoWin(){
     var r3 = my_choice === "Scissors" && enemy_choice == "Rock";
     var r4 = my_choice === enemy_choice;
 
-    if(r1 | r2 | r3){
+    if(r1 || r2 || r3){
         $("#game_result").append("<h5>"+enemy+" won!</h5>")
         my_lose += 1;
     }else if(r4){
@@ -114,6 +114,7 @@ function enemyOfflineHandle(){
             $("#player2_name").text(enemy + " has left the game!");
             $("#player2_choice").empty();
             $("#player2_result").empty();
+            $("#game_result").empty();
             database.ref("players/"+my_key).update({enemy:"",
                                                     waitTime:moment().format("X"),
                                                     message:""});
@@ -139,7 +140,8 @@ function checkIfHaveEnemy(){
                 my_enemy_key = Object.keys(snap.val())[0];
                 var enemy_data = snap.val()[my_enemy_key];
                 
-                if(enemy_data !== null){
+                if(enemy_data !== null && (enemy_data.enemy === "" || enemy_data.enemy === my_name)){
+                    wait_time = Number.MAX_VALUE;
                     database.ref("players/"+my_enemy_key).update({enemy: my_name, waitTime: wait_time});
 
                     // render player2's choice and score
@@ -161,6 +163,8 @@ function checkIfHaveEnemy(){
 
                     // handle enemy offline event
                     enemyOfflineHandle();
+                }else{
+                    $("#player2_choice").append("<p>Sorry,"+data+" is not available!")
                 }
             })
         }       
@@ -174,7 +178,7 @@ function checkIfSomeoneWaiting(data){
         if(data[key].enemy === ""){  // if the returned player isn't playing with someone
             my_enemy_key = key;
             enemy = data[my_enemy_key].name;
-            wait_time = Number.MIN_VALUE;
+            wait_time = Number.MAX_VALUE;
 
             // set myself as the enemy of the returned player and waitTime to min integer 
             database.ref("players/"+my_enemy_key).update({enemy: my_name, waitTime: wait_time});                                 
@@ -279,7 +283,7 @@ $("document").ready(function(){
 
     // when player1 can select his/her enemy, set this person as his/her enemy 
     $("#player2_choice").on("click",".nextPlayer",function(){   
-        wait_time = Number.MIN_VALUE;
+        wait_time = Number.MAX_VALUE;
         database.ref("players/"+my_key).update({enemy:$(this).text(),waitTime: wait_time});
     })
     
