@@ -33,6 +33,7 @@
 
         <!-- main game -->
         <div class="row justify-content-center" id="game_div">
+            <!-- player1's section -->
             <div class="col-10 col-md-3 m-2" id="player1">
                 <div class="card">
                     <div class="card-body">
@@ -43,12 +44,14 @@
                 </div>
             </div>
 
+            <!-- render result here -->
             <div class="col-10 col-md-3 m-2" id="result">
                 <div class="card" >
                     <div class="card-body" id="game_result"></div>
                 </div>               
             </div>
 
+            <!-- player2's section -->
             <div class="col-10 col-md-3 m-2" id="player2">
                 <div class="card" >
                     <div class="card-body">
@@ -58,6 +61,7 @@
                     <div class="card-body" id="player2_result"></div>
                 </div>
             </div>
+
         </div>
 
         <!-- message box -->
@@ -66,7 +70,7 @@
                 <form>
                     <div>
                         <label>Messages:</label><br>
-                        <div id="dialogue"></div>
+                        <div id="dialogue" class="animated" style="overflow: scroll"></div>
                     </div>
                     <div>
                         <input type="text" id="my_message">

@@ -45,6 +45,14 @@ body {
     border: lightblue .25em solid;
 }
 
+p {
+    margin: 0;
+}
+
+.red_border {
+    border: Tomato .3em solid;
+}
+
 /* footer */
 #footer {
     margin: 1em 0;
