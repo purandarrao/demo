@@ -37,8 +37,10 @@ Please contact Erin at meiyuechang@gmail.com for details on our code of conduct,
 
 null
 
-## Acknowledgments
+## More:
+1.	Since this is a simple gaming application, I used the auto clear up API from Firebase to remove player’s information when player leaves the game (like refresh page or close browser).
+2.	The most difficult part of this project is when/where to place a Firebase database call to let it automatically update players’ info and alert other player.  After some logical analysis of the game and many testing, I could correctly combine the Firebase API calls and JavaScript codes and made perfectly work together. 
+4.	Refactoring code and adding new functions are still keep and going. 
 
-null
 
 
