@@ -267,17 +267,17 @@ $("document").ready(function(){
                         // check database and render player1's choice and score
                         initPlayer1Game();
 
-                        // check if player1 makes a choice
-                        // TODO #6
-                        // Use on() method to listen on the change of `value` of the child `"players/"+my_key+"/choice"`
-                        // and assign it to a variable named `listener_on`
-                        listener_on = database.ref("players/"+my_key+"/choice").on("value")
-                        listener_on.then(function(snapshot){
+                        handle_choice_func = function(snapshot){
                             my_choice = snapshot.val();
                             if(my_choice !== "" && enemy_choice !== ""){ // if player2 has made a choice
                                 checkWhoWin();
                             };
-                        })
+                        }
+                        // check if player1 makes a choice
+                        // TODO #6
+                        // Use on() method to listen on the change of `value` of the child `"players/"+my_key+"/choice"`
+                        // and assign it to a variable named `listener_on`
+                        listener_on = database.ref("players/"+my_key+"/choice").on("value", handle_choice_func)
 
                         // handle player1 offline event
                         handlePlayer1Offline();
