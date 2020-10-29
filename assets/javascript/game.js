@@ -15,6 +15,7 @@ firebase.initializeApp(config);
 // TODO #1
 // Use the `firebase.database()` to access the default app's Database service, 
 // and assign to a variable named `database`
+// TIP: https://firebase.google.com/docs/database/web/start
 // Write your code here ...
 
 // TODO #2
@@ -128,6 +129,7 @@ function enemyOfflineHandle(){
         if (snapshot.val() === null && enemy !== "") {
             // TODO #6
             // Use remove() method to remove the child `"players/"+my_enemy_key` 
+            // ** Remember before calling remove(), you need a ref object database.ref(`path_to_the_child`).remove()
             // Write your code here ...
 
             $("#player2_name").text(enemy + " has left the game!");
@@ -232,6 +234,7 @@ function savePlayer1Info(){
     }
     // TODO #4
     // Use update() method save player info `player1_info` to the child `"players/"+my_key`
+    // ** Remember before calling update(), you need a ref object, like `database.ref(`path_to_the_child`).update(arg)
     // Write your code here ...
 }
 
@@ -279,7 +282,7 @@ $("document").ready(function(){
                         // check if player1 makes a choice
                         // TODO #5
                         // Call on() method with argument `"value", handle_choice_func` to listen on the change of `value` of the child `"players/"+my_key+"/choice"`
-                        // and assign it to a variable named `listener_on`
+                        // ** Remember before calling on("value", handle_choice_func), you need a ref object
                         // Write your code here ...
 
                         // handle player1 offline event
