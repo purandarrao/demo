@@ -9,17 +9,18 @@ var config = {
     messagingSenderId: "234736765783"
 };
 
-// TODO #1
 // Use the `firebase.initializeApp()` to initialize the firebase with above config
 firebase.initializeApp(config);
-// TODO #2
+
+// TODO #1
 // Use the `firebase.database()` to access the default app's Database service, 
 // and assign to a variable named `database`
-var database = firebase.database();
-// TODO #3
+// Write your code here ...
+
+// TODO #2
 // Use `ref()` method of above `database` object refer to a child named "players" in the DB, 
 // and assign it to a variable named `player_ref`
-var player_ref = database.ref("players/");
+// Write your code here ...
 
 var in_game = false;
 var my_name = "";
@@ -33,10 +34,11 @@ var my_enemy_key = null;
 // Create a new child in the DB
 var my_child = player_ref.push()
 
-// TODO #4
+// TODO #3
 // Use getKey() method to get the auto-generated key of the child `my_child`, 
 // and assign it to a variable named `my_key` 
-var my_key = my_child.getKey();
+// Write your code here ...
+
 var wait_time;
 var flashInterval = null;
 
@@ -124,9 +126,10 @@ function checkWhoIsavailable(){
 function enemyOfflineHandle(){
     database.ref("players/"+my_enemy_key).on('value', function(snapshot) {     
         if (snapshot.val() === null && enemy !== "") {
-            // TODO #7
+            // TODO #6
             // Use remove() method to remove the child `"players/"+my_enemy_key` 
-            database.ref("players/"+my_enemy_key).remove();
+            // Write your code here ...
+
             $("#player2_name").text(enemy + " has left the game!");
             $("#player2_choice").empty();
             $("#player2_result").empty();
@@ -227,9 +230,9 @@ function savePlayer1Info(){
         online: true,
         message: ""
     }
-    // TODO #5
+    // TODO #4
     // Use update() method save player info `player1_info` to the child `"players/"+my_key`
-    database.ref("players/"+my_key).update(player1_info);
+    // Write your code here ...
 }
 
 // handle player1 offline event
@@ -274,10 +277,10 @@ $("document").ready(function(){
                             };
                         }
                         // check if player1 makes a choice
-                        // TODO #6
-                        // Use on() method to listen on the change of `value` of the child `"players/"+my_key+"/choice"`
+                        // TODO #5
+                        // Call on() method with argument `"value", handle_choice_func` to listen on the change of `value` of the child `"players/"+my_key+"/choice"`
                         // and assign it to a variable named `listener_on`
-                        listener_on = database.ref("players/"+my_key+"/choice").on("value", handle_choice_func)
+                        // Write your code here ...
 
                         // handle player1 offline event
                         handlePlayer1Offline();
