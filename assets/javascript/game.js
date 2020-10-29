@@ -9,8 +9,16 @@ var config = {
     messagingSenderId: "234736765783"
 };
 
+// TODO #1
+// Use the `firebase.initializeApp()` to initialize the firebase with above config
 firebase.initializeApp(config);
+// TODO #2
+// Use the `firebase.database()` to access the default app's Database service, 
+// and assign to a variable named `database`
 var database = firebase.database();
+// TODO #3
+// Use `ref()` method of above `database` object refer to a child named "players" in the DB, 
+// and assign it to a variable named `player_ref`
 var player_ref = database.ref("players/");
 
 var in_game = false;
@@ -22,7 +30,13 @@ var my_choice = "";
 var enemy = "";
 var enemy_choice = "";
 var my_enemy_key = null;
-var my_key = player_ref.push().getKey();;
+// Create a new child in the DB
+var my_child = player_ref.push()
+
+// TODO #4
+// Use getKey() method to get the auto-generated key of the child `my_child`, 
+// and assign it to a variable named `my_key` 
+var my_key = my_child.getKey();
 var wait_time;
 var flashInterval = null;
 
@@ -110,6 +124,8 @@ function checkWhoIsavailable(){
 function enemyOfflineHandle(){
     database.ref("players/"+my_enemy_key).on('value', function(snapshot) {     
         if (snapshot.val() === null && enemy !== "") {
+            // TODO #7
+            // Use remove() method to remove the child `"players/"+my_enemy_key` 
             database.ref("players/"+my_enemy_key).remove();
             $("#player2_name").text(enemy + " has left the game!");
             $("#player2_choice").empty();
@@ -211,6 +227,8 @@ function savePlayer1Info(){
         online: true,
         message: ""
     }
+    // TODO #5
+    // Use update() method save player info `player1_info` to the child `"players/"+my_key`
     database.ref("players/"+my_key).update(player1_info);
 }
 
@@ -250,7 +268,11 @@ $("document").ready(function(){
                         initPlayer1Game();
 
                         // check if player1 makes a choice
-                        database.ref("players/"+my_key+"/choice").on("value",function(snapshot){
+                        // TODO #6
+                        // Use on() method to listen on the change of `value` of the child `"players/"+my_key+"/choice"`
+                        // and assign it to a variable named `listener_on`
+                        listener_on = database.ref("players/"+my_key+"/choice").on("value")
+                        listener_on.then(function(snapshot){
                             my_choice = snapshot.val();
                             if(my_choice !== "" && enemy_choice !== ""){ // if player2 has made a choice
                                 checkWhoWin();
